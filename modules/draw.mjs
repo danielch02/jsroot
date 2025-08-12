@@ -352,6 +352,7 @@ function setDefaultDrawOpt(classname, opt) {
 async function draw(dom, obj, opt) {
    if (!isObject(obj))
       return Promise.reject(Error('not an object in draw call'));
+   console.log('drawww')
 
    if (isStr(opt) && (opt.indexOf(kInspect) === 0))
       return import_h().then(h => h.drawInspector(dom, obj, opt));
@@ -494,6 +495,7 @@ async function draw(dom, obj, opt) {
 async function redraw(dom, obj, opt) {
    if (!isObject(obj))
       return Promise.reject(Error('not an object in redraw'));
+   console.log('redrawww');
 
    const can_painter = getElementCanvPainter(dom);
    let handle, res_painter = null, redraw_res;

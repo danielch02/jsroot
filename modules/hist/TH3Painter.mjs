@@ -6,6 +6,7 @@ import { createLineSegments, PointsCreator, Box3D, THREE } from '../base/base3d.
 import { THistPainter } from '../hist2d/THistPainter.mjs';
 import { assignFrame3DMethods } from './hist3d.mjs';
 import { proivdeEvalPar, getTF1Value } from '../base/func.mjs';
+import {jsrootSubjectGet} from "../jsrootSubject.js";
 
 
 /**
@@ -368,8 +369,12 @@ class TH3Painter extends THistPainter {
 
    /** @summary Drawing of 3D histogram */
    async draw3DBins() {
-      if (!this.draw_content)
-         return false;
+      if (!this.draw_content){
+          console.error('doesnt have draw COntet');
+          return false;
+      }
+
+      const allMeshes = [];
 
       const o = this.getOptions();
 
@@ -377,7 +382,10 @@ class TH3Painter extends THistPainter {
 
       if (!box_option && o.Scat) {
          const promise = this.draw3DScatter();
-         if (promise !== false) return promise;
+         if (promise !== false) {
+             console.error('draw Scatter');
+             return promise;
+         };
          box_option = 12; // fall back to box2 draw option
       } else if (!box_option && !o.GLBox && !o.GLColor && !o.Lego)
          box_option = 12; // default draw option
@@ -472,8 +480,10 @@ class TH3Painter extends THistPainter {
          k1 = this.getSelectIndex('z', 'left', 0.5),
          k2 = this.getSelectIndex('z', 'right', 0);
 
-      if ((i2 <= i1) || (j2 <= j1) || (k2 <= k1))
-         return false;
+      // if ((i2 <= i1) || (j2 <= j1) || (k2 <= k1)){
+      //     console.error('IDK FALSE');
+      //     return false;
+      // }
 
       const cntr = use_colors ? this.getContour() : null,
             palette = use_colors ? this.getHistPalette() : null,
@@ -518,6 +528,9 @@ class TH3Painter extends THistPainter {
                   negative_matrixes.push(bin_matrix);
             }
          }
+
+         //-------- SU MATRIXY__--------------
+
       }
 
       function getBinTooltip(intersect) {
@@ -569,7 +582,9 @@ class TH3Painter extends THistPainter {
             bin_mesh.get_weight = get_bin_weight;
             bin_mesh.tooltip = getBinTooltip;
 
+            allMeshes.push(bin_mesh);
             fp.add3DMesh(bin_mesh);
+            console.log('bin_mesh, ', bin_mesh)
          }
       } else {
          if (use_colors)
@@ -592,6 +607,8 @@ class TH3Painter extends THistPainter {
          all_bins_mesh.get_weight = get_bin_weight;
          all_bins_mesh.tooltip = getBinTooltip;
 
+         console.log('all_bins_mesh, ', all_bins_mesh);
+         allMeshes.push(all_bins_mesh);
          fp.add3DMesh(all_bins_mesh);
       }
 
@@ -610,14 +627,18 @@ class TH3Painter extends THistPainter {
                   positions[vvv+2] = m[14] + (vert.z - 0.5) * m[10];
                }
             }
+            console.log('segment, ', createLineSegments(positions, helper_material));
+            allMeshes.push(createLineSegments(positions, helper_material));
             fp.add3DMesh(createLineSegments(positions, helper_material));
          };
 
          addLines(Box3D.Segments, bins_matrixes);
          addLines(Box3D.Crosses, negative_matrixes);
       }
+      // return allMeshes;
+       jsrootSubjectGet().next(allMeshes);
 
-      return true;
+       return true;
    }
 
 

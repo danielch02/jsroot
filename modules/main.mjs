@@ -23,6 +23,8 @@ export * from './hist/TH3Painter.mjs';
 
 export * from './hist/TGraphPainter.mjs';
 
+export * from './jsrootSubject.js';
+
 export { geoCfg } from './geom/geobase.mjs';
 
 export { createGeoPainter, TGeoPainter } from './geom/TGeoPainter.mjs';
